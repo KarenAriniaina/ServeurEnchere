@@ -1,17 +1,10 @@
 package Tp.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import Tp.dao.ObjetBDD;
 
-import org.bson.Document;
+public class Configuration extends ObjetBDD {
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-import Tp.dao.Connexion;
-
-public class Configuration {
-    private int id;
+    private String idConfiguration;
     private double DureeMin;
     private double DureeMax;
     private double Commission;
@@ -19,12 +12,12 @@ public class Configuration {
     public Configuration() {
     }
 
-    public int getId() {
-        return id;
+    public String getIdConfiguration() {
+        return idConfiguration;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdConfiguration(String idConfiguration) {
+        this.idConfiguration = idConfiguration;
     }
 
     public double getDureeMin() {
@@ -51,6 +44,7 @@ public class Configuration {
         Commission = commission;
     }
 
+    /* 
     public void UpdateConfig() throws Exception{
         MongoDatabase m=Connexion.getMongoConnection();
         Document doc=new Document();
@@ -69,5 +63,6 @@ public class Configuration {
             System.out.println(document.toJson());
         }
     }
+    */
 
 }
