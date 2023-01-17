@@ -31,7 +31,7 @@ public class UtilisateurController {
                 if (la[0] != null) {
                     //--- tsy maintsy atsoina satria tsy auto setter ao amn re ObjetBDD re token---//
                     Admin ad=la[0];
-                    a.getToken();
+                    ad.getToken();
                     la[0]=a;
                     json.setData(la);
                     json.setMessage("Operation reussie");
