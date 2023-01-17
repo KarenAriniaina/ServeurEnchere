@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import Tp.JSonData.JsonData;
 import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
+import Tp.model.Admin;
 import Tp.model.Categorie;
 
 @RestController
@@ -22,30 +24,40 @@ public class CategorieController {
 
     @CrossOrigin
     @PostMapping("Categorie/")
-    public JsonData AjoutCategorie(@RequestParam String designation) throws Exception {
+    public JsonData AjoutCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
+            @RequestParam String designation) throws Exception {
         JsonData json = new JsonData();
-        Connection con=null;
-        try {
-            con=Connexion.getConnection();
-            con.setAutoCommit(false);
-            Categorie c=new Categorie();
-            c.setDesignation(designation);
-            c.Create(con);
-            c.setIdCategorie("Categorie_"+Integer.toString(c.currentSequence(con)));
-            Object[] lc=new Object[1];
-            lc[0]=c;
-            json.setData(lc);
-            json.setMessage("Operation reussi");
-            con.commit();
-        } catch (Exception e) {
-            if(con!=null) con.rollback();
+        Connection con = null;
+        Admin a = new Admin();
+        a.setIdAdmin(idAdmin);
+        a.setToken(token);
+        if (!a.VerifToken()) {
+            try {
+                con = Connexion.getConnection();
+                con.setAutoCommit(false);
+                Categorie c = new Categorie();
+                c.setDesignation(designation);
+                c.Create(con);
+                c.setIdCategorie("Categorie_" + Integer.toString(c.currentSequence(con)));
+                Object[] lc = new Object[1];
+                lc[0] = c;
+                json.setData(lc);
+                json.setMessage("Operation reussi");
+                con.commit();
+            } catch (Exception e) {
+                if (con != null)
+                    con.rollback();
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            } finally {
+                if (con != null)
+                    con.close();
+            }
+        } else {
             json.setData(null);
-            json.setMessage("Operation echoue");
-            json.setStatus(false);
-            json.setErreur(e.getMessage());
-        }
-        finally{
-            if(con!=null) con.close();
+            json.setMessage("Vous n'etes pas connecté");
         }
         return json;
 
@@ -53,22 +65,31 @@ public class CategorieController {
 
     @CrossOrigin
     @PostMapping("Categorie/{id}")
-    public JsonData UpdateCategorie(@PathParam("id") String id,@RequestParam("description") String designation) throws Exception {
+    public JsonData UpdateCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
+            @PathParam("id") String id, @RequestParam("description") String designation) throws Exception {
         JsonData json = new JsonData();
-        try {
-            Categorie c=new Categorie();
-            c.setIdCategorie(id);
-            c.setDesignation(designation);
-            c.Update(null);
-            Object[] lc=new Object[1];
-            lc[0]=c;
-            json.setData(lc);
-            json.setMessage("Operation reussi");
-        } catch (Exception e) {
+        Admin a = new Admin();
+        a.setIdAdmin(idAdmin);
+        a.setToken(token);
+        if (!a.VerifToken()) {
+            try {
+                Categorie c = new Categorie();
+                c.setIdCategorie(id);
+                c.setDesignation(designation);
+                c.Update(null);
+                Object[] lc = new Object[1];
+                lc[0] = c;
+                json.setData(lc);
+                json.setMessage("Operation reussi");
+            } catch (Exception e) {
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            }
+        } else {
             json.setData(null);
-            json.setMessage("Operation echoue");
-            json.setStatus(false);
-            json.setErreur(e.getMessage());
+            json.setMessage("Vous n'etes pas connecté");
         }
         return json;
 
@@ -76,31 +97,42 @@ public class CategorieController {
 
     @CrossOrigin
     @PostMapping("/DeleteCategorie/{idC}")
-    public JsonData DeleteCategorie(@PathParam("idC") String idCategorie) throws Exception {
+    public JsonData DeleteCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
+            @PathParam("idC") String idCategorie) throws Exception {
         JsonData json = new JsonData();
-        Connection con=null;
-        try {
-            con=Connexion.getConnection();
-            con.setAutoCommit(false);
-            Categorie c=new Categorie();
-            c.setIdCategorie(idCategorie);
-            c.setNomTable("CategorieDelete");
-            c.setPrimaryKey("idCategorieDelete");
-            c.Create(con);
-            Object[] lc=new Object[1];
-            lc[0]=c;
-            json.setData(lc);
-            json.setMessage("Operation delete reussi");
-            con.commit();
-        } catch (Exception e) {
-            if(con!=null) con.rollback();
+        Connection con = null;
+        Admin a = new Admin();
+        a.setIdAdmin(idAdmin);
+        a.setToken(token);
+        if (!a.VerifToken()) {  
+            try {
+
+                con = Connexion.getConnection();
+                con.setAutoCommit(false);
+                Categorie c = new Categorie();
+                c.setIdCategorie(idCategorie);
+                c.setNomTable("CategorieDelete");
+                c.setPrimaryKey("idCategorieDelete");
+                c.Create(con);
+                Object[] lc = new Object[1];
+                lc[0] = c;
+                json.setData(lc);
+                json.setMessage("Operation delete reussi");
+                con.commit();
+            } catch (Exception e) {
+                if (con != null)
+                    con.rollback();
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            } finally {
+                if (con != null)
+                    con.close();
+            }
+        } else {
             json.setData(null);
-            json.setMessage("Operation echoue");
-            json.setStatus(false);
-            json.setErreur(e.getMessage());
-        }
-        finally{
-            if(con!=null) con.close();
+            json.setMessage("Vous n'etes pas connecté");
         }
         return json;
 
@@ -108,17 +140,26 @@ public class CategorieController {
 
     @CrossOrigin
     @RequestMapping("/Categories")
-    public JsonData ListeCategorie(@PathParam("idC") String idCategorie) throws Exception {
+    public JsonData ListeCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
+            @PathParam("idC") String idCategorie) throws Exception {
         JsonData json = new JsonData();
-        try {
-            ObjetBDD[] lc=new Categorie().Find(null);
-            json.setData(lc);
-            json.setMessage("Operation delete reussi");
-        } catch (Exception e) {
+        Admin a = new Admin();
+        a.setIdAdmin(idAdmin);
+        a.setToken(token);
+        if (!a.VerifToken()) {
+            try {
+                ObjetBDD[] lc = new Categorie().Find(null);
+                json.setData(lc);
+                json.setMessage("Operation delete reussi");
+            } catch (Exception e) {
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            }
+        } else {
             json.setData(null);
-            json.setMessage("Operation echoue");
-            json.setStatus(false);
-            json.setErreur(e.getMessage());
+            json.setMessage("Vous n'etes pas connecté");
         }
         return json;
 
