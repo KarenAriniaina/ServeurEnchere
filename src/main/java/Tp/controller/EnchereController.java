@@ -97,7 +97,6 @@ public class EnchereController {
             try {
                 con = Connexion.getConnection();
                 con.setAutoCommit(false);
-
                 Enchere e = new Enchere();
                 e.setIdEnchere(idEnchere);
                 e.setNomTable("EnchereDelete");
@@ -127,5 +126,6 @@ public class EnchereController {
         return json;
 
     }
+    
 
 }

@@ -1,6 +1,7 @@
 package Tp.controller;
 
 import java.sql.Connection;
+import java.util.Date;
 
 import javax.websocket.server.PathParam;
 
@@ -16,6 +17,7 @@ import Tp.JSonData.JsonData;
 import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
 import Tp.model.Categorie;
+import Tp.model.Enchere;
 
 @RestController
 public class CategorieController {
@@ -24,28 +26,29 @@ public class CategorieController {
     @PostMapping("Categorie/")
     public JsonData AjoutCategorie(@RequestParam String designation) throws Exception {
         JsonData json = new JsonData();
-        Connection con=null;
+        Connection con = null;
         try {
-            con=Connexion.getConnection();
+            con = Connexion.getConnection();
             con.setAutoCommit(false);
-            Categorie c=new Categorie();
+            Categorie c = new Categorie();
             c.setDesignation(designation);
             c.Create(con);
-            c.setIdCategorie("Categorie_"+Integer.toString(c.currentSequence(con)));
-            Object[] lc=new Object[1];
-            lc[0]=c;
+            c.setIdCategorie("Categorie_" + Integer.toString(c.currentSequence(con)));
+            Object[] lc = new Object[1];
+            lc[0] = c;
             json.setData(lc);
             json.setMessage("Operation reussi");
             con.commit();
         } catch (Exception e) {
-            if(con!=null) con.rollback();
+            if (con != null)
+                con.rollback();
             json.setData(null);
             json.setMessage("Operation echoue");
             json.setStatus(false);
             json.setErreur(e.getMessage());
-        }
-        finally{
-            if(con!=null) con.close();
+        } finally {
+            if (con != null)
+                con.close();
         }
         return json;
 
@@ -53,15 +56,16 @@ public class CategorieController {
 
     @CrossOrigin
     @PostMapping("Categorie/{id}")
-    public JsonData UpdateCategorie(@PathParam("id") String id,@RequestParam("description") String designation) throws Exception {
+    public JsonData UpdateCategorie(@PathParam("id") String id, @RequestParam("description") String designation)
+            throws Exception {
         JsonData json = new JsonData();
         try {
-            Categorie c=new Categorie();
+            Categorie c = new Categorie();
             c.setIdCategorie(id);
             c.setDesignation(designation);
             c.Update(null);
-            Object[] lc=new Object[1];
-            lc[0]=c;
+            Object[] lc = new Object[1];
+            lc[0] = c;
             json.setData(lc);
             json.setMessage("Operation reussi");
         } catch (Exception e) {
@@ -78,29 +82,30 @@ public class CategorieController {
     @PostMapping("/DeleteCategorie/{idC}")
     public JsonData DeleteCategorie(@PathParam("idC") String idCategorie) throws Exception {
         JsonData json = new JsonData();
-        Connection con=null;
+        Connection con = null;
         try {
-            con=Connexion.getConnection();
+            con = Connexion.getConnection();
             con.setAutoCommit(false);
-            Categorie c=new Categorie();
+            Categorie c = new Categorie();
             c.setIdCategorie(idCategorie);
             c.setNomTable("CategorieDelete");
             c.setPrimaryKey("idCategorieDelete");
             c.Create(con);
-            Object[] lc=new Object[1];
-            lc[0]=c;
+            Object[] lc = new Object[1];
+            lc[0] = c;
             json.setData(lc);
             json.setMessage("Operation delete reussi");
             con.commit();
         } catch (Exception e) {
-            if(con!=null) con.rollback();
+            if (con != null)
+                con.rollback();
             json.setData(null);
             json.setMessage("Operation echoue");
             json.setStatus(false);
             json.setErreur(e.getMessage());
-        }
-        finally{
-            if(con!=null) con.close();
+        } finally {
+            if (con != null)
+                con.close();
         }
         return json;
 
@@ -111,9 +116,59 @@ public class CategorieController {
     public JsonData ListeCategorie(@PathParam("idC") String idCategorie) throws Exception {
         JsonData json = new JsonData();
         try {
-            ObjetBDD[] lc=new Categorie().Find(null);
+            ObjetBDD[] lc = new Categorie().Find(null);
             json.setData(lc);
             json.setMessage("Operation delete reussi");
+        } catch (Exception e) {
+            json.setData(null);
+            json.setMessage("Operation echoue");
+            json.setStatus(false);
+            json.setErreur(e.getMessage());
+        }
+        return json;
+
+    }
+
+    @CrossOrigin
+    @RequestMapping("/RechercheEncheres")
+    public JsonData RechereAvance(@RequestParam String motsCle, @RequestParam String idCategorie,
+            @RequestParam Double prixmin, @RequestParam Double prixmax,
+            @RequestParam Date Datedebut, @RequestParam Date DateFin) throws Exception {
+        JsonData json = new JsonData();
+        try {
+            String requtes = "SELECT  * FROM enchere where 1=1";
+            if (motsCle != null) {
+                requtes += " AND description like '%" + motsCle + "'%";
+            }
+            if (idCategorie != null) {
+                requtes += " AND idCategorie='" + idCategorie + "'";
+            }
+            if (DateFin != null || Datedebut != null) {
+                if (DateFin != null && Datedebut != null) {
+                    requtes += " AND (Date BETWEEN" + Datedebut + " and " + DateFin + ")";
+                }
+                if (DateFin != null && Datedebut == null) {
+                    requtes += " AND (Date <=" + DateFin + ")";
+                }
+                if (DateFin == null && Datedebut != null) {
+                    requtes += " AND (Date >=" + Datedebut + ")";
+                }
+            }
+            if (prixmax != null || prixmin != null) {
+                if (prixmax != null && prixmin != null) {
+                    requtes += " AND (prix BETWEEN" + prixmin + " and " + prixmax + ")";
+                }
+                if (prixmax != null && prixmin == null) {
+                    requtes += " AND (prix <=" + prixmax + ")";
+                }
+                if (prixmax == null && prixmin != null) {
+                    requtes += " AND (prix >=" + prixmin + ")";
+                }
+            }
+
+            ObjetBDD[] lc = new Enchere().Find(null, requtes);
+            json.setData(lc);
+            json.setMessage("Operation select reussi");
         } catch (Exception e) {
             json.setData(null);
             json.setMessage("Operation echoue");
