@@ -44,6 +44,8 @@ public class Enchere extends ObjetBDD {
     }
 
     public Enchere() {
+        this.setNomTable("Enchere");
+        this.setPrimaryKey("idEnchere");
     }
 
     public void setDuree(int duree) {
