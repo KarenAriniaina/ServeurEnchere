@@ -75,7 +75,7 @@ public class DemandeRechargementController {
                 double montant = c.getSolde();
                 montant += d.getMontant();
                 c.setSolde(montant);
-                d.setStatut(0);
+                d.setStatut(2);
                 d.Update(con);
                 c.Update(con);
                 Object[] ld = new Object[1];
