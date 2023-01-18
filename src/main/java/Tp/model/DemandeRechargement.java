@@ -6,7 +6,7 @@ public class DemandeRechargement extends ObjetBDD{
     private String idDemandeRechargement;
     private String idClient;
     private double montant;
-    private int statut; //1: en cours 0:Valide
+    private int statut; //1: en cours 2:Valide
 
     public DemandeRechargement(){
         this.setNomTable("DemandeRechargement");

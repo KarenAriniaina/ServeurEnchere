@@ -5,15 +5,15 @@ import java.util.Date;
 import Tp.dao.ObjetBDD;
 
 public class Enchere extends ObjetBDD {
-    String idEnchere;
-    String Nom;
-    String idCategorie;
-    int Duree;
-    Double PrixDepart;
-    String Description;
-    String idClient;
-    Date Date;
-    Double Commission;
+    private String idEnchere;
+    private String Nom;
+    private String idCategorie;
+    private int Duree;
+    private Double PrixDepart;
+    private String Description;
+    private String idClient;
+    private Date Date;
+    private Double Commission;
 
     public String getIdEnchere() {
         return idEnchere;

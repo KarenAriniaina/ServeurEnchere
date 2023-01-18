@@ -3,10 +3,7 @@ package Tp.controller;
 import java.sql.Connection;
 import java.util.Date;
 
-import javax.websocket.server.PathParam;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,7 +22,7 @@ import Tp.model.Enchere;
 public class CategorieController {
 
     @CrossOrigin
-    @PostMapping("Categorie/")
+    @PostMapping("/Categorie")
     public JsonData AjoutCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
             @RequestParam String designation) throws Exception {
         JsonData json = new JsonData();
@@ -33,7 +30,7 @@ public class CategorieController {
         Admin a = new Admin();
         a.setIdAdmin(idAdmin);
         a.setToken(token);
-        if (!a.VerifToken()) {
+        if (a.VerifToken()) {
             try {
                 con = Connexion.getConnection();
                 con.setAutoCommit(false);
@@ -68,12 +65,12 @@ public class CategorieController {
     @CrossOrigin
     @PostMapping("Categorie/{id}")
     public JsonData UpdateCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
-            @PathParam("id") String id, @RequestParam("description") String designation) throws Exception {
+            @PathVariable("id") String id, @RequestParam("description") String designation) throws Exception {
         JsonData json = new JsonData();
         Admin a = new Admin();
         a.setIdAdmin(idAdmin);
         a.setToken(token);
-        if (!a.VerifToken()) {
+        if (a.VerifToken()) {
             try {
                 Categorie c = new Categorie();
                 c.setIdCategorie(id);
@@ -100,13 +97,13 @@ public class CategorieController {
     @CrossOrigin
     @PostMapping("/DeleteCategorie/{idC}")
     public JsonData DeleteCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
-            @PathParam("idC") String idCategorie) throws Exception {
+            @PathVariable("idC") String idCategorie) throws Exception {
         JsonData json = new JsonData();
         Connection con = null;
         Admin a = new Admin();
         a.setIdAdmin(idAdmin);
         a.setToken(token);
-        if (!a.VerifToken()) {  
+        if (a.VerifToken()) {
             try {
 
                 con = Connexion.getConnection();
@@ -142,26 +139,17 @@ public class CategorieController {
 
     @CrossOrigin
     @RequestMapping("/Categories")
-    public JsonData ListeCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
-            @PathParam("idC") String idCategorie) throws Exception {
+    public JsonData ListeCategorie() throws Exception {
         JsonData json = new JsonData();
-        Admin a = new Admin();
-        a.setIdAdmin(idAdmin);
-        a.setToken(token);
-        if (!a.VerifToken()) {
-            try {
-                ObjetBDD[] lc = new Categorie().Find(null);
-                json.setData(lc);
-                json.setMessage("Operation delete reussi");
-            } catch (Exception e) {
-                json.setData(null);
-                json.setMessage("Operation echoue");
-                json.setStatus(false);
-                json.setErreur(e.getMessage());
-            }
-        } else {
+        try {
+            ObjetBDD[] lc = new Categorie().Find(null);
+            json.setData(lc);
+            json.setMessage("Operation reussi");
+        } catch (Exception e) {
             json.setData(null);
-            json.setMessage("Vous n'etes pas connecté");
+            json.setMessage("Operation echoue");
+            json.setStatus(false);
+            json.setErreur(e.getMessage());
         }
         return json;
 
