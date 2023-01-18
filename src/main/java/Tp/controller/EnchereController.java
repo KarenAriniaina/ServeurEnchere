@@ -87,7 +87,7 @@ public class EnchereController {
 
     @CrossOrigin
     @PostMapping("/DeleteEnchere/{idE}")
-    public JsonData DeleteCategorie(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
+    public JsonData DeleteEnchere(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin,
             @PathParam("idE") String idEnchere) throws Exception {
         JsonData json = new JsonData();
         Connection con = null;
