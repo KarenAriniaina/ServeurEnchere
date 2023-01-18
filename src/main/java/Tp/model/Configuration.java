@@ -10,6 +10,8 @@ public class Configuration extends ObjetBDD {
     private double Commission;
 
     public Configuration() {
+        this.setNomTable("Configuration");
+        this.setPrimaryKey("idConfiguration");
     }
 
     public String getIdConfiguration() {
