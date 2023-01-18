@@ -48,7 +48,7 @@ public class ConfigurationController {
         Admin a = new Admin();
         a.setIdAdmin(idAdmin);
         a.setToken(token);
-        if (!a.VerifToken()) {
+        if (a.VerifToken()) {
             try {
                 con = Connexion.getConnection();
                 Configuration c = new Configuration();
@@ -63,6 +63,7 @@ public class ConfigurationController {
                 else
                     c.Update(con);
                 con.commit();
+                json.setMessage("Operation reussi");
             } catch (Exception e) {
                 if (con != null)
                     con.rollback();
@@ -81,4 +82,38 @@ public class ConfigurationController {
         return json;
 
     }
+
+    @CrossOrigin
+    @GetMapping("Configurations/")
+    public JsonData ListeConfig(@RequestHeader("token") String token, @RequestHeader("idAdmin") String idAdmin) throws Exception {
+        JsonData json = new JsonData();
+        Connection con = null;
+        Admin a = new Admin();
+        a.setIdAdmin(idAdmin);
+        a.setToken(token);
+        if (a.VerifToken()) {
+            try {
+                con = Connexion.getConnection();
+                Configuration c = new Configuration();
+                ObjetBDD[] lc = c.Find(con);
+                json.setData(lc);
+                json.setMessage("Operation Reussi");
+            } catch (Exception e) {
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            } finally {
+                if (con != null)
+                    con.close();
+            }
+        } else {
+            json.setData(null);
+            json.setMessage("Vous n'etes pas connecté");
+        }
+        return json;
+
+    }
+
+
 }
