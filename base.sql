@@ -62,7 +62,7 @@ CREATE TABLE Enchere (
   idEnchere varchar(10) NOT NULL,
   Nom varchar(50) NOT NULL,
   idCategorie varchar(20) NOT NULL,
-  Duree int4 NOT NULL,
+  Duree DOUBLE PRECISION NOT NULL,
   PrixDepart DOUBLE PRECISION NOT NULL,
   Description text NOT NULL,
   idClient varchar(50) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE Encherir (
   idEnchere varchar(10) NOT NULL,
   idClient varchar(50) NOT NULL,
   Montant DOUBLE PRECISION NOT NULL,
-  Date timestamp NOT NULL,
+  Date timestamp NOT NULL DEFAULT current_timestamp NOT NULL,
   PRIMARY KEY (idEncherir)
 );
 
@@ -126,6 +126,9 @@ INSERT INTO Enchere VALUES ('Enchere_'||nextval('s_Enchere'),'Enchere 2','Catego
 CREATE OR REPLACE VIEW v_EnchereFini AS
    SELECT * FROM Enchere E WHERE date+(duree * interval '1 day')::interval<current_timestamp;
 
+CREATE OR REPLACE VIEW v_EnchereEnCours AS
+  SELECT * FROM Enchere WHERE idEnchere NOT IN (SELECT idEnchere FROM v_EnchereFini);
+  
 CREATE OR REPLACE VIEW v_DernierEncherirEnchere AS  
   SELECT * FROM Encherir ORDER BY Date DESC LIMIT 1;
   
