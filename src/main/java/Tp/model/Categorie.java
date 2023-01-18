@@ -1,5 +1,7 @@
 package Tp.model;
 
+import java.sql.Connection;
+
 import Tp.dao.ObjetBDD;
 
 public class Categorie extends ObjetBDD {
@@ -25,6 +27,14 @@ public class Categorie extends ObjetBDD {
 
     public void setDesignation(String designation) {
         Designation = designation;
+    }
+
+    @Override
+    public ObjetBDD[] Find(Connection c) throws Exception {
+        this.setNomTable("v_Categorie");
+        ObjetBDD[] liste= super.Find(c);
+        this.setNomTable("Categorie");
+        return liste;
     }
 
 }

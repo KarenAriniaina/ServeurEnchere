@@ -154,6 +154,8 @@ public class ObjetBDD {
             String pkval = "";
             sql = sql + "UPDATE " + NomTable + " SET ";
             Class cl = this.getClass();
+            int verif=0;
+            System.out.println(cl.getDeclaredFields().length);
             for (int i = 0; i < cl.getDeclaredFields().length; i++) {
                 String field = cl.getDeclaredFields()[i].getName();
                 if (verif_column(field, c) == true) {
@@ -165,30 +167,35 @@ public class ObjetBDD {
                                 boolean normal = verifier(value);
                                 if (normal == true) {
                                     if (field.equalsIgnoreCase(PrimaryKey) == false) {
-                                        if (isDouble(pkval) == true || isInteger(pkval) == true) {
-                                            sql = sql + field + " =" + value;
-                                            if (i < cl.getDeclaredFields().length - 1) {
-                                                sql = sql + ", ";
+                                        if (isDouble(value) == true || isInteger(value) == true) {
+                                            if(verif==0){
+                                                sql = sql + field + " =" + value;
+                                                verif++;
                                             }
+                                            else sql = sql + ","+field + " =" + value;
                                         } else {
-                                            sql = sql + field + " = '" + value + "'";
-                                            if (i < cl.getDeclaredFields().length - 1) {
-                                                sql = sql + ", ";
+                                            if(verif==0){
+                                                sql = sql +field + " = '" + value + "'"; 
+                                                verif++;
                                             }
+                                            else sql = sql + ","+field + " = '" + value + "'";
                                         }
                                     } else {
                                         pkval = value;
                                     }
                                 }
+                                System.out.println(verif);
                             }
                         }
                     }
                 }
             }
             sql = sql + " WHERE " + PrimaryKey + "='" + pkval + "'";
+            System.out.println(sql);
             st = c.createStatement();
             st.execute(sql);
         } catch (Exception e) {
+            e.printStackTrace();
             throw e;
         } finally {
             if (st != null) {
@@ -238,6 +245,7 @@ public class ObjetBDD {
                     }
                 }
             }
+            System.out.println(sql);
             set = st.executeQuery(sql);
             int v = 0;
             int vale = 0;
@@ -266,9 +274,6 @@ public class ObjetBDD {
             }
             val = new ObjetBDD[vale];
             System.arraycopy(valiny, 0, val, 0, val.length);
-            if (!nullve) {
-                c.close();
-            }
         } catch (Exception e) {
             throw e;
         } finally {
