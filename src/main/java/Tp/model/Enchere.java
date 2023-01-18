@@ -2,7 +2,9 @@ package Tp.model;
 
 import java.util.Date;
 
-public class Enchere {
+import Tp.dao.ObjetBDD;
+
+public class Enchere extends ObjetBDD {
     String idEnchere;
     String Nom;
     String idCategorie;

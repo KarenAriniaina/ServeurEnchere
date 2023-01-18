@@ -1,6 +1,7 @@
 package Tp.controller;
 
 import java.sql.Connection;
+import java.util.Date;
 
 import javax.websocket.server.PathParam;
 
@@ -18,6 +19,7 @@ import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
 import Tp.model.Admin;
 import Tp.model.Categorie;
+import Tp.model.Enchere;
 
 @RestController
 public class CategorieController {
@@ -160,6 +162,56 @@ public class CategorieController {
         } else {
             json.setData(null);
             json.setMessage("Vous n'etes pas connecté");
+        }
+        return json;
+
+    }
+
+    @CrossOrigin
+    @RequestMapping("/RechercheEncheres")
+    public JsonData RechereAvance(@RequestParam String motsCle, @RequestParam String idCategorie,
+            @RequestParam Double prixmin, @RequestParam Double prixmax,
+            @RequestParam Date Datedebut, @RequestParam Date DateFin) throws Exception {
+        JsonData json = new JsonData();
+        try {
+            String requtes = "SELECT  * FROM enchere where 1=1";
+            if (motsCle != null) {
+                requtes += " AND description like '%" + motsCle + "'%";
+            }
+            if (idCategorie != null) {
+                requtes += " AND idCategorie='" + idCategorie + "'";
+            }
+            if (DateFin != null || Datedebut != null) {
+                if (DateFin != null && Datedebut != null) {
+                    requtes += " AND (Date BETWEEN" + Datedebut + " and " + DateFin + ")";
+                }
+                if (DateFin != null && Datedebut == null) {
+                    requtes += " AND (Date <=" + DateFin + ")";
+                }
+                if (DateFin == null && Datedebut != null) {
+                    requtes += " AND (Date >=" + Datedebut + ")";
+                }
+            }
+            if (prixmax != null || prixmin != null) {
+                if (prixmax != null && prixmin != null) {
+                    requtes += " AND (prix BETWEEN" + prixmin + " and " + prixmax + ")";
+                }
+                if (prixmax != null && prixmin == null) {
+                    requtes += " AND (prix <=" + prixmax + ")";
+                }
+                if (prixmax == null && prixmin != null) {
+                    requtes += " AND (prix >=" + prixmin + ")";
+                }
+            }
+
+            ObjetBDD[] lc = new Enchere().Find(null, requtes);
+            json.setData(lc);
+            json.setMessage("Operation select reussi");
+        } catch (Exception e) {
+            json.setData(null);
+            json.setMessage("Operation echoue");
+            json.setStatus(false);
+            json.setErreur(e.getMessage());
         }
         return json;
 

@@ -347,4 +347,74 @@ public class ObjetBDD {
 
         return val;
     }
+
+    // select mandray requetes 
+
+    public ObjetBDD[] Find(Connection c ,String sql) throws Exception {
+        boolean nullve = false;
+        ObjetBDD[] val = new ObjetBDD[0];
+        Statement st = null;
+        ResultSet sett = null;
+        ResultSet set = null;
+        try {
+            if (c == null) {
+                c = Connexion.getConnection();
+                nullve = true;
+            }
+            ObjetBDD[] valiny = new ObjetBDD[100];
+            
+            st = c.createStatement();
+            sett = st.executeQuery(sql);
+            
+            set = st.executeQuery(sql);
+            int v = 0;
+            int vale = 0;
+            Class cl = this.getClass();
+            while (set.next() == true) {
+                valiny[v] = this.getClass().newInstance();
+                for (int i = 0; i < cl.getDeclaredFields().length; i++) {
+                    String field = cl.getDeclaredFields()[i].getName();
+                    if (verif_col(set, field.toLowerCase()) == true) {
+                        Method m = cl.getDeclaredMethod("set" + field.substring(0, 1).toUpperCase() + field.substring(1), cl.getDeclaredFields()[i].getType());
+                        field = field.toLowerCase();
+                        m.invoke(valiny[v], set.getObject(field));
+                    }
+                }
+                //superclass
+                for (int i = 0; i < cl.getSuperclass().getDeclaredFields().length; i++) {
+                    String field = cl.getSuperclass().getDeclaredFields()[i].getName();
+                    if (verif_col(set, field.toLowerCase()) == true) {
+                        Method m = cl.getSuperclass().getMethod("set" + field.substring(0, 1).toUpperCase() + field.substring(1), cl.getSuperclass().getDeclaredFields()[i].getType());
+                        field = field.toLowerCase();
+                        m.invoke(valiny[v], set.getObject(field));
+                    }
+                }
+                v++;
+                vale++;
+            }
+            val = new ObjetBDD[vale];
+            System.arraycopy(valiny, 0, val, 0, val.length);
+            if (!nullve) {
+                c.close();
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (set != null) {
+                set.close();
+            }
+            if (sett != null) {
+                sett.close();
+            }
+            if (st != null) {
+                st.close();
+            }
+            if (nullve && c != null) {
+                c.close();
+            }
+        }
+        return val;
+    }
+
+    
 }
