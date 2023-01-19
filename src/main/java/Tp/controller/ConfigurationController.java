@@ -55,7 +55,7 @@ public class ConfigurationController {
                 c.setIdConfiguration("Configuration_1");
                 ObjetBDD[] lc = c.Find(con);
                 c.setDureeMax(dureemax);
-                c.setDureeMin(dureemin);
+                c.setDureMin(dureemin);
                 c.setCommission(commission);
                 con.setAutoCommit(false);
                 if (lc.length == 0)

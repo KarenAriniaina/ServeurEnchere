@@ -5,7 +5,7 @@ import Tp.dao.ObjetBDD;
 public class Configuration extends ObjetBDD {
 
     private String idConfiguration;
-    private double DureeMin;
+    private double DureMin;
     private double DureeMax;
     private double Commission;
 
@@ -22,12 +22,12 @@ public class Configuration extends ObjetBDD {
         this.idConfiguration = idConfiguration;
     }
 
-    public double getDureeMin() {
-        return DureeMin;
+    public double getDureMin() {
+        return DureMin;
     }
 
-    public void setDureeMin(double dureeMin) {
-        DureeMin = dureeMin;
+    public void setDureMin(double dureMin) {
+        DureMin = dureMin;
     }
 
     public double getDureeMax() {
@@ -51,7 +51,7 @@ public class Configuration extends ObjetBDD {
         MongoDatabase m=Connexion.getMongoConnection();
         Document doc=new Document();
         if(this.getCommission()==0){
-            doc.append("DureeMin",this.getDureeMin()).append("DureeMax", this.getDureeMax());
+            doc.append("DureMin",this.getDureMin()).append("DureeMax", this.getDureeMax());
         }
     }
 
