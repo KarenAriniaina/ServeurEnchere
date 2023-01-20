@@ -1,16 +1,28 @@
 package Tp.model;
 
+import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
+
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import javax.crypto.spec.SecretKeySpec;
+
+import org.bson.Document;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.internal.connection.Time;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -122,6 +134,25 @@ public class Client extends ObjetBDD {
             sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
         }
         this.setMdp(sb.toString());
+    }
+
+    public Object[] getListeEnchere() throws Exception{
+        MongoDatabase database = Connexion.getMongoConnection();
+        MongoCollection<Document> collection = database.getCollection("Enchere");
+        Enchere[] liste=null;
+        ArrayList<Enchere> le=new ArrayList<>();
+        for (Document doc : collection.find().filter(new Document("idClient",this.getIdClient()))) {
+            Enchere e=new Enchere();
+            e.setDate(Timestamp.valueOf(doc.getString("datefin")));
+            e.setIdEnchere(doc.getString("idEnchere"));
+            e.setNom(doc.getString("Nom"));
+            e.setIdCategorie(doc.getString("idCategorie"));
+            e.setPrixDepart(doc.getDouble("prixdepart"));
+            e.setDescription(doc.getString("description"));
+            e.setEncherir((List<Encherir>)doc.get("encherir"));
+            le.add(e);
+        }
+        return le.toArray();
     }
 
 }
