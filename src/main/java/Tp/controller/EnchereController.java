@@ -25,11 +25,12 @@ public class EnchereController {
     @CrossOrigin
     @PostMapping("/Enchere")
     public JsonData AjoutEnchere(@RequestHeader("token") String token, @RequestHeader("idClient") String idClient,
-            @RequestParam String Nom, @RequestParam String idCategorie, @RequestParam double Jour,@RequestParam double heure,@RequestParam double Minute,
+            @RequestParam String Nom, @RequestParam String idCategorie, @RequestParam double Jour,
+            @RequestParam double heure, @RequestParam double Minute,
             @RequestParam Double PrixDepart, @RequestParam String Description) throws Exception {
         JsonData json = new JsonData();
         Connection con = null;
-        double Duree=Jour+(heure/60)+(Minute/1440);
+        double Duree = Jour + (heure / 60) + (Minute / 1440);
         Client c = new Client();
         c.setToken(token);
         c.setIdClient(idClient);
@@ -97,13 +98,13 @@ public class EnchereController {
                 Enchere en = new Enchere();
                 en.setIdEnchere(idEnchere);
                 en.setNomTable("v_EnchereEnCours");
-                ObjetBDD [] len=en.Find(con);
-                if(len.length==0){
+                ObjetBDD[] len = en.Find(con);
+                if (len.length == 0) {
                     json.setData(null);
                     json.setMessage("Enchere deja cloturé");
                     return json;
                 }
-                en=(Enchere) len[0];
+                en = (Enchere) len[0];
                 if (en.getIdClient().equalsIgnoreCase(c.getIdClient())) {
                     json.setData(null);
                     json.setMessage("Vous ne pouvez faire l'enchere vu que vous etes proprietaire");
@@ -118,38 +119,39 @@ public class EnchereController {
                         json.setMessage("Dernier mise superieur à la votre");
                         return json;
                     }
-                } else {
-                    if (Montant < en.getPrixDepart()) {
-                        json.setData(null);
-                        json.setMessage("Montant proposé inferieur au montant de depart");
-                        return json;
+                    // System.out.println("ato");
+                    else {
+                        if (Montant < en.getPrixDepart()) {
+                            json.setData(null);
+                            json.setMessage("Montant proposé inferieur au montant de depart");
+                            return json;
+                        }
+                        c = (Client) c.Find(con)[0];
+                        if (c.getSolde() < Montant) {
+                            json.setData(null);
+                            json.setMessage("Votre solde est trop bas");
+                            return json;
+                        }
+                        double solde = c.getSolde() - Montant;
+                        // rendre son solde au precedent nanao encherir
+                        if (ec.getIdClient() != null) {
+                            Client last = new Client();
+                            last.setIdClient(ec.getIdClient());
+                            last = (Client) last.Find(con)[0];
+                            double soldelast = last.getSolde() + ec.getMontant();
+                            last.setSolde(soldelast);
+                            last.Update(con);
+                        }
+                        // analana ny solde an re client miencherir
+                        c.setSolde(solde);
+                        c.Update(con);
+                        // Inserer-na amn zay re encherir
+                        ec.setIdClient(idClient);
+                        ec.setIdEncherir(null);
+                        ec.setMontant(Montant);
+                        ec.Create(con);
+                        json.setMessage("Operation reussi");
                     }
-                    c = (Client) c.Find(con)[0];
-                    if (c.getSolde() < Montant) {
-                        json.setData(null);
-                        json.setMessage("Votre solde est trop bas");
-                        return json;
-                    }
-                    double solde = c.getSolde() - Montant;
-                    // rendre son solde au precedent nanao encherir
-                    if (ec.getIdClient() != null) {
-                        Client last = new Client();
-                        last.setIdClient(ec.getIdClient());
-                        last = (Client) last.Find(con)[0];
-                        double soldelast = last.getSolde() + ec.getMontant();
-                        last.setSolde(soldelast);
-                        last.Update(con);
-                    }
-
-                    // analana ny solde an re client miencherir
-                    c.setSolde(solde);
-                    c.Update(con);
-                    // Inserer-na amn zay re encherir
-                    ec.setIdClient(idClient);
-                    ec.setIdEncherir(null);
-                    ec.setMontant(Montant);
-                    ec.Create(con);
-                    json.setMessage("Operation reussi");
                 }
             } catch (Exception e) {
                 if (con != null)
@@ -232,6 +234,32 @@ public class EnchereController {
             json.setMessage("Operation echoue");
             json.setStatus(false);
             json.setErreur(e.getMessage());
+        }
+        return json;
+    }
+
+    @CrossOrigin
+    @RequestMapping("/HistoriqueEncheres/")
+    public JsonData HitsoriqueEnchere(@RequestHeader("token") String token, @RequestHeader("idClient") String idClient)
+            throws Exception {
+        JsonData json = new JsonData();
+        Client c = new Client();
+        c.setToken(token);
+        c.setIdClient(idClient);
+        if (c.VerifToken()) {
+            try {
+                json.setData(c.getListeEnchere());
+                json.setMessage("Operation select reussi");
+            } catch (Exception e) {
+                json.setData(null);
+                json.setMessage("Operation echoue");
+                json.setStatus(false);
+                json.setErreur(e.getMessage());
+            }
+        }else{
+            json.setData(null);
+            json.setMessage("Vous n'etes pas connecté");
+            json.setStatus(false);
         }
         return json;
     }

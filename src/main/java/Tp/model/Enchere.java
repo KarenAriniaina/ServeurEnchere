@@ -120,24 +120,42 @@ public class Enchere extends ObjetBDD {
 
     @Override
     public void Create(Connection c) throws Exception {
-        super.Create(c);
-        String currentId = "Enchere_" + Integer.toString(this.currentSequence(c));
-        this.setIdEnchere(currentId);
-        MongoDatabase database = Connexion.getMongoConnection();
-        MongoCollection<Document> collection = database.getCollection("Enchere");
-        Document filtre = new Document("idEnchere", this.getIdEnchere());
-        Instant instant = Instant.ofEpochMilli(this.getDate().getTime());
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        int DureeEnSeconde = (int) Duree * 3600;
-        localDateTime = localDateTime.plusSeconds(DureeEnSeconde);
-        filtre.append("datefin", Timestamp.valueOf(localDateTime).toString());
-        filtre.append("prixdepart", this.getPrixDepart()).append("description", this.getDescription()).append("Nom",
-                this.getNom());
-        Categorie ca = new Categorie();
-        ca.setIdCategorie(this.getIdCategorie());
-        ca = (Categorie) ca.Find(c)[0];
-        filtre.append("Categorie", ca.getDesignation());
-        collection.insertOne(filtre);
+        try{
+            super.Create(c);
+            String currentId = "Enchere_" + Integer.toString(this.currentSequence(c));
+            System.out.println(currentId);
+            this.setIdEnchere(currentId);
+            Enchere en=(Enchere) this.Find(c)[0];
+            MongoDatabase database = Connexion.getMongoConnection();
+            MongoCollection<Document> collection = database.getCollection("Enchere");
+            Document filtre = new Document("idEnchere", this.getIdEnchere());
+            System.out.println(filtre.toJson());
+            Instant instant = Instant.ofEpochMilli(en.getDate().getTime());
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            System.out.println(localDateTime);
+            int DureeEnSeconde = (int) Duree * 3600*24;
+            System.out.println(localDateTime);
+            localDateTime = localDateTime.plusSeconds(DureeEnSeconde);
+            System.out.println(localDateTime);
+            filtre.append("datefin", Timestamp.valueOf(localDateTime).toString());
+            System.out.println(filtre.toJson());
+            filtre.append("prixdepart", this.getPrixDepart()).append("description", this.getDescription()).append("Nom",
+                    this.getNom());
+            System.out.println(filtre.toJson());
+            Categorie ca = new Categorie();
+            ca.setIdCategorie(this.getIdCategorie());
+            ca = (Categorie) ca.Find(c)[0];
+            filtre.append("Categorie", ca.getDesignation());
+            filtre.append("idCategorie", this.getIdCategorie());
+            filtre.append("idClient", this.getIdClient());
+            System.out.println(filtre.toJson());
+            this.setEncherir(new ArrayList<>());
+            filtre.append("encherir", this.getEncherir());
+            collection.insertOne(filtre);
+        }catch(Exception ex){
+            if(c!=null) c.rollback();
+            throw ex;
+        }
     }
 
     /*public Enchere[] getListeEnchere() throws Exception {

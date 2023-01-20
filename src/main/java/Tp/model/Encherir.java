@@ -56,6 +56,7 @@ public class Encherir extends ObjetBDD {
     @Override
     public void Create(Connection c) throws Exception {
         // TODO Auto-generated method stub
+        this.setNomTable("Encherir");
         super.Create(c);
         Client client=new Client();
         client.setIdClient(this.getIdClient());
@@ -64,9 +65,10 @@ public class Encherir extends ObjetBDD {
         MongoCollection<Document> collection = database.getCollection("Enchere");
         Document encherir = new Document("Client",client.getNom() )
                     .append("Montant encheri", this.getMontant());
-
-        Document update = new Document("$append", new Document("encherir", encherir));
+        Document update = new Document("$push", new Document("encherir", encherir));
+        System.out.println(update.toJson());
         Document filtre=    new Document("idEnchere",this.getIdEnchere());
+        System.out.println(filtre.toJson());
         collection.updateOne(filtre, update);
     }
 
