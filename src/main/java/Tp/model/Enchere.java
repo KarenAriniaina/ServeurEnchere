@@ -13,7 +13,10 @@ import javax.print.Doc;
 import java.sql.Timestamp;
 
 import org.bson.Document;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
+import com.google.gson.Gson;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -120,12 +123,12 @@ public class Enchere extends ObjetBDD {
 
     @Override
     public void Create(Connection c) throws Exception {
-        try{
+        try {
             super.Create(c);
             String currentId = "Enchere_" + Integer.toString(this.currentSequence(c));
             System.out.println(currentId);
             this.setIdEnchere(currentId);
-            Enchere en=(Enchere) this.Find(c)[0];
+            Enchere en = (Enchere) this.Find(c)[0];
             MongoDatabase database = Connexion.getMongoConnection();
             MongoCollection<Document> collection = database.getCollection("Enchere");
             Document filtre = new Document("idEnchere", this.getIdEnchere());
@@ -133,7 +136,7 @@ public class Enchere extends ObjetBDD {
             Instant instant = Instant.ofEpochMilli(en.getDate().getTime());
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             System.out.println(localDateTime);
-            int DureeEnSeconde = (int) Duree * 3600*24;
+            int DureeEnSeconde = (int) Duree * 3600 * 24;
             System.out.println(localDateTime);
             localDateTime = localDateTime.plusSeconds(DureeEnSeconde);
             System.out.println(localDateTime);
@@ -152,19 +155,57 @@ public class Enchere extends ObjetBDD {
             this.setEncherir(new ArrayList<>());
             filtre.append("encherir", this.getEncherir());
             collection.insertOne(filtre);
-        }catch(Exception ex){
-            if(c!=null) c.rollback();
+        } catch (Exception ex) {
+            if (c != null)
+                c.rollback();
             throw ex;
         }
     }
 
-    /*public Enchere[] getListeEnchere() throws Exception {
+    /*
+    public Object[] getListeEnchere() throws Exception {
         MongoDatabase database = Connexion.getMongoConnection();
         MongoCollection<Document> collection = database.getCollection("Enchere");
-        ArrayList<Enchere> le=new ArrayList<Enchere>();
-        for(Document c:collection.find()){
-            Enchere e=new Enchere();
-            e.setDate();
+        Enchere[] liste = null;
+        ArrayList<Enchere> l = new ArrayList<>();
+        ArrayList<Document> docu=new ArrayList<>();
+        //FindIterable<Document> ld = ;
+        for (Document doc : collection.find()) {
+            System.out.println(doc.toJson());
+            docu.add(doc);
+            /*Enchere e = new Enchere();
+            e.setDate(Timestamp.valueOf(doc.getString("datefin")));
+            System.out.println(e.getDate());
+            e.setIdEnchere(doc.getString("idEnchere"));
+            e.setNom(doc.getString("Nom"));
+            e.setIdCategorie(doc.getString("idCategorie"));
+            e.setPrixDepart(doc.getDouble("prixdepart"));
+            e.setDescription(doc.getString("description"));
+            /*List<Document> docc = (List<Document>) doc.get("Encherir");
+            List<Encherir> li = new ArrayList<>();
+            for (Document eDoc : docc) {
+                Encherir comment = new Encherir();
+                comment.setMontant(eDoc.getDouble("montant encheri"));
+                li.add(comment);
+            }
+            e.setEncherir(li);
         }
-    }*/
+        System.out.println(docu.size());
+        for(Document d:docu){
+            Gson g=new Gson();
+            Enchere e=g.fromJson(d.toJson(), Enchere.class);
+            /*Enchere e = new Enchere();
+            e.setDate(Timestamp.valueOf(d.getString("datefin")));
+            System.out.println(e.getDate());
+            e.setIdEnchere(d.getString("idEnchere"));
+            e.setNom(d.getString("Nom"));
+            e.setIdCategorie(d.getString("idCategorie"));
+            e.setPrixDepart(d.getDouble("prixdepart"));
+            e.setDescription(d.getString("description"));
+            System.out.println(e.getDescription());
+            l.add(e);
+        }
+        return l.toArray();
+    }
+    */
 }
