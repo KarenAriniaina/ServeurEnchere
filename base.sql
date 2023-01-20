@@ -120,8 +120,6 @@ CREATE VIEW v_Rechargement AS
   SELECT D.Montant,D.idDemandeRechargement,C.Nom,D.statut FROM DemandeRechargement D 
   JOIN Client C ON D.idClient=C.idClient;
 
-INSERT INTO Enchere VALUES ('Enchere_1'||nextval('s_Enchere'),'Enchere 1','Categorie_1',2,11000,'Tres bon etat','Client_1',current_timestamp,10);
-INSERT INTO Enchere VALUES ('Enchere_'||nextval('s_Enchere'),'Enchere 2','Categorie_2',2,11000,'Tres bon etat','Client_2',current_timestamp,10);
 /* top 3 categorie be mpanao enchere / chiffre d'affaire journalier / top 3 client mividy entana */
   CREATE OR REPLACE VIEW  v_CategorieTop3 AS 
     SELECT CAST(COUNT(E.idCategorie) as int) as nombre,C.Designation FROM Enchere E JOIN Categorie C ON E.idCategorie=C.idCategorie GROUP BY E.idCategorie,C.Designation ORDER BY nombre DESC LIMIT 3;

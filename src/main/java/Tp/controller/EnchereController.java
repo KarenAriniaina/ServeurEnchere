@@ -111,46 +111,46 @@ public class EnchereController {
                 Encherir ec = new Encherir();
                 ec.setIdEnchere(idEnchere);
                 ec.getDernierEncherir(con);
+                System.out.println(ec.getMontant());
                 if (ec.getMontant() > 0) {
                     if (Montant <= ec.getMontant()) {
                         json.setData(null);
                         json.setMessage("Dernier mise superieur à la votre");
                         return json;
                     }
-                    // System.out.println("ato");
-                    else {
-                        if (Montant < en.getPrixDepart()) {
-                            json.setData(null);
-                            json.setMessage("Montant proposé inferieur au montant de depart");
-                            return json;
-                        }
-                        c = (Client) c.Find(con)[0];
-                        if (c.getSolde() < Montant) {
-                            json.setData(null);
-                            json.setMessage("Votre solde est trop bas");
-                            return json;
-                        }
-                        double solde = c.getSolde() - Montant;
-                        // rendre son solde au precedent nanao encherir
-                        if (ec.getIdClient() != null) {
-                            Client last = new Client();
-                            last.setIdClient(ec.getIdClient());
-                            last = (Client) last.Find(con)[0];
-                            double soldelast = last.getSolde() + ec.getMontant();
-                            last.setSolde(soldelast);
-                            last.Update(con);
-                        }
-                        // analana ny solde an re client miencherir
-                        c.setSolde(solde);
-                        c.Update(con);
-                        // Inserer-na amn zay re encherir
-                        ec.setIdClient(idClient);
-                        ec.setIdEncherir(null);
-                        ec.setMontant(Montant);
-                        ec.Create(con);
-                        json.setMessage("Operation reussi");
-                    }
                 }
+                System.out.println("ato");
+                if (Montant < en.getPrixDepart()) {
+                    json.setData(null);
+                    json.setMessage("Montant proposé inferieur au montant de depart");
+                    return json;
+                }
+                c = (Client) c.Find(con)[0];
+                if (c.getSolde() < Montant) {
+                    json.setData(null);
+                    json.setMessage("Votre solde est trop bas");
+                    return json;
+                }
+                double solde = c.getSolde() - Montant;
+                // rendre son solde au precedent nanao encherir
+                if (ec.getIdClient() != null) {
+                    Client last = new Client();
+                    last.setIdClient(ec.getIdClient());
+                    last = (Client) last.Find(con)[0];
+                    double soldelast = last.getSolde() + ec.getMontant();
+                    last.setSolde(soldelast);
+                    last.Update(con);
+                }
+                // analana ny solde an re client miencherir
+                c.setSolde(solde);
+                c.Update(con);
+                // Inserer-na amn zay re encherir
+                ec.setIdClient(idClient);
+                ec.setIdEncherir(null);
+                ec.setMontant(Montant);
+                ec.Create(con);
+                json.setMessage("Operation reussi");
+
             } catch (Exception e) {
                 if (con != null)
                     con.rollback();
@@ -225,13 +225,14 @@ public class EnchereController {
         JsonData json = new JsonData();
         try {
             ObjetBDD[] lc = new Enchere().Find(null);
+            // Object[] lc=new Enchere().getListeEnchere();
             json.setData(lc);
             json.setMessage("Operation select reussi");
         } catch (Exception e) {
             json.setData(null);
             json.setMessage("Operation echoue");
             json.setStatus(false);
-            json.setErreur(e.getMessage());
+            json.setErreur(e.getMessage() + "ef");
         }
         return json;
     }
@@ -254,7 +255,7 @@ public class EnchereController {
                 json.setStatus(false);
                 json.setErreur(e.getMessage());
             }
-        }else{
+        } else {
             json.setData(null);
             json.setMessage("Vous n'etes pas connecté");
             json.setStatus(false);

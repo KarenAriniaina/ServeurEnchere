@@ -53,6 +53,29 @@ public class UtilisateurController {
     }
 
     @CrossOrigin
+    @PostMapping("/InscriptionAdmin")
+    public JsonData InscriptionAdmin(@RequestParam String login, @RequestParam String mdp) throws Exception {
+        JsonData json = new JsonData();
+        try {
+            Admin a = new Admin();
+            a.setLogin(login);
+            a.setMdp(mdp);
+            a.EncrypterMdp();
+            a.Create(null);
+            json.setData(null);
+            json.setMessage("Operation reussi");
+            json.setStatus(true);
+        } catch (Exception e) {
+            json.setData(null);
+            json.setMessage("Operation echoue");
+            json.setStatus(false);
+            json.setErreur(e.getMessage());
+        }
+        return json;
+
+    }
+
+    @CrossOrigin
     @PostMapping("/LoginClient")
     public JsonData LoginClient(@RequestParam String email, @RequestParam String mdp) throws Exception {
         JsonData json = new JsonData();
@@ -108,7 +131,7 @@ public class UtilisateurController {
             c.Create(null);
             // c.setIdClient("Client_"+Integer.toString(c.currentSequence(null)));
             Object[] lc = new Object[1];
-            lc[1] = c;
+            lc[0] = c;
             json.setData(lc);
             json.setMessage("Operation Reussi");
         } catch (Exception e) {
