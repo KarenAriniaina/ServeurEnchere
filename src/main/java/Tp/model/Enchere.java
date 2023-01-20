@@ -155,50 +155,52 @@ public class Enchere extends ObjetBDD {
         }
     }
 
-    /*
-    public Object[] getListeEnchere() throws Exception {
+    public static Object[] getListeEnchere() throws Exception {
         MongoDatabase database = Connexion.getMongoConnection();
         MongoCollection<Document> collection = database.getCollection("Enchere");
-        Enchere[] liste = null;
-        ArrayList<Enchere> l = new ArrayList<>();
-        ArrayList<Document> docu=new ArrayList<>();
-        //FindIterable<Document> ld = ;
+        Enchere[] liste=null;
+        ArrayList<Enchere> le=new ArrayList<>();
         for (Document doc : collection.find()) {
-            System.out.println(doc.toJson());
-            docu.add(doc);
-            /*Enchere e = new Enchere();
+            Enchere e=new Enchere();
             e.setDate(Timestamp.valueOf(doc.getString("datefin")));
-            System.out.println(e.getDate());
             e.setIdEnchere(doc.getString("idEnchere"));
             e.setNom(doc.getString("Nom"));
             e.setIdCategorie(doc.getString("idCategorie"));
             e.setPrixDepart(doc.getDouble("prixdepart"));
             e.setDescription(doc.getString("description"));
-            /*List<Document> docc = (List<Document>) doc.get("Encherir");
-            List<Encherir> li = new ArrayList<>();
-            for (Document eDoc : docc) {
-                Encherir comment = new Encherir();
-                comment.setMontant(eDoc.getDouble("montant encheri"));
-                li.add(comment);
-            }
-            e.setEncherir(li);
+            e.setEncherir((List<Encherir>)doc.get("encherir"));
+            le.add(e);
         }
-        System.out.println(docu.size());
-        for(Document d:docu){
-            Gson g=new Gson();
-            Enchere e=g.fromJson(d.toJson(), Enchere.class);
-            /*Enchere e = new Enchere();
-            e.setDate(Timestamp.valueOf(d.getString("datefin")));
-            System.out.println(e.getDate());
-            e.setIdEnchere(d.getString("idEnchere"));
-            e.setNom(d.getString("Nom"));
-            e.setIdCategorie(d.getString("idCategorie"));
-            e.setPrixDepart(d.getDouble("prixdepart"));
-            e.setDescription(d.getString("description"));
-            System.out.println(e.getDescription());
-            l.add(e);
-        }
-        return l.toArray();
+        return le.toArray();
+        /*
+         * MongoDatabase database = Connexion.getMongoConnection();
+         * MongoCollection<Document> collection = database.getCollection("Enchere");
+         * ArrayList<Document> docu=new ArrayList<>();
+         * ArrayList<String> liste=new ArrayList<>();
+         * //FindIterable<Document> ld = ;
+         * for (Document doc : collection.find()) {
+         * System.out.println(doc.toJson());
+         * liste.add(doc.toJson());
+         * }
+         */
     }
-    */
+
+    public static Object[] getEnchere(String id) throws Exception {
+        MongoDatabase database = Connexion.getMongoConnection();
+        MongoCollection<Document> collection = database.getCollection("Enchere");
+        ArrayList<Enchere> le=new ArrayList<>();
+        for (Document doc : collection.find().filter(new Document("idEnchere", id))) {
+            Enchere e=new Enchere();
+            e.setDate(Timestamp.valueOf(doc.getString("datefin")));
+            e.setIdEnchere(doc.getString("idEnchere"));
+            e.setNom(doc.getString("Nom"));
+            e.setIdCategorie(doc.getString("idCategorie"));
+            e.setPrixDepart(doc.getDouble("prixdepart"));
+            e.setDescription(doc.getString("description"));
+            e.setEncherir((List<Encherir>)doc.get("encherir"));
+            le.add(e);
+        }
+        return le.toArray();
+    }
+
 }

@@ -2,6 +2,7 @@ package Tp.controller;
 
 import java.sql.Connection;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -224,8 +225,28 @@ public class EnchereController {
     public JsonData ListeEnchere() throws Exception {
         JsonData json = new JsonData();
         try {
-            ObjetBDD[] lc = new Enchere().Find(null);
-            // Object[] lc=new Enchere().getListeEnchere();
+            //ObjetBDD[] lc = new Enchere().Find(null);
+            Object[] lc=Enchere.getListeEnchere();
+            json.setData(lc);
+            json.setMessage("Operation select reussi");
+        } catch (Exception e) {
+            json.setData(null);
+            json.setMessage("Operation echoue");
+            json.setStatus(false);
+            json.setErreur(e.getMessage() + "ef");
+        }
+        return json;
+    }
+
+    @CrossOrigin
+    @GetMapping("/Enchere/{id}")
+    public JsonData getEnchere(@PathVariable("id") String id) throws Exception {
+        JsonData json = new JsonData();
+        try {
+            //ObjetBDD[] lc = new Enchere().Find(null);
+            Enchere en=new Enchere();
+            en.setIdEnchere(id);
+            Object[] lc=Enchere.getEnchere(id);
             json.setData(lc);
             json.setMessage("Operation select reussi");
         } catch (Exception e) {
