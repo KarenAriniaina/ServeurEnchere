@@ -62,7 +62,7 @@ CREATE TABLE Enchere (
   idEnchere varchar(10) NOT NULL,
   Nom varchar(50) NOT NULL,
   idCategorie varchar(20) NOT NULL,
-  Duree int4 NOT NULL,
+  Duree DOUBLE PRECISION NOT NULL,
   PrixDepart DOUBLE PRECISION NOT NULL,
   Description text NOT NULL,
   idClient varchar(50) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE Encherir (
   idEnchere varchar(10) NOT NULL,
   idClient varchar(50) NOT NULL,
   Montant DOUBLE PRECISION NOT NULL,
-  Date timestamp NOT NULL,
+  Date timestamp NOT NULL DEFAULT current_timestamp NOT NULL,
   PRIMARY KEY (idEncherir)
 );
 
@@ -116,16 +116,22 @@ CREATE OR REPLACE VIEW v_Categorie AS
   SELECT * FROM Categorie WHERE idCategorie NOT IN (SELECT idCategorie FROM CategorieDelete);
 
 
+CREATE VIEW v_Rechargement AS 
+  SELECT D.Montant,D.idDemandeRechargement,C.Nom,D.statut FROM DemandeRechargement D 
+  JOIN Client C ON D.idClient=C.idClient;
 
 INSERT INTO Enchere VALUES ('Enchere_1'||nextval('s_Enchere'),'Enchere 1','Categorie_1',2,11000,'Tres bon etat','Client_1',current_timestamp,10);
 INSERT INTO Enchere VALUES ('Enchere_'||nextval('s_Enchere'),'Enchere 2','Categorie_2',2,11000,'Tres bon etat','Client_2',current_timestamp,10);
 /* top 3 categorie be mpanao enchere / chiffre d'affaire journalier / top 3 client mividy entana */
   CREATE OR REPLACE VIEW  v_CategorieTop3 AS 
-    SELECT COUNT(E.idCategorie) as nombre,C.Designation FROM Enchere E JOIN Categorie C ON E.idCategorie=C.idCategorie GROUP BY E.idCategorie,C.Designation ORDER BY nombre DESC LIMIT 3;
+    SELECT CAST(COUNT(E.idCategorie) as int) as nombre,C.Designation FROM Enchere E JOIN Categorie C ON E.idCategorie=C.idCategorie GROUP BY E.idCategorie,C.Designation ORDER BY nombre DESC LIMIT 3;
 
 CREATE OR REPLACE VIEW v_EnchereFini AS
    SELECT * FROM Enchere E WHERE date+(duree * interval '1 day')::interval<current_timestamp;
 
+CREATE OR REPLACE VIEW v_EnchereEnCours AS
+  SELECT * FROM Enchere WHERE idEnchere NOT IN (SELECT idEnchere FROM v_EnchereFini);
+  
 CREATE OR REPLACE VIEW v_DernierEncherirEnchere AS  
   SELECT * FROM Encherir ORDER BY Date DESC LIMIT 1;
   
@@ -135,4 +141,4 @@ CREATE OR REPLACE VIEW v_EnchereFiniDetail AS
    JOIN Client C ON C.idClient=Er.idClient;
 
   CREATE OR REPLACE VIEW v_ClientTop3 AS 
-  SELECT NomClient,COUNT(idClientNividy) as nombre FROM v_EnchereFiniDetail GROUP BY  idClientNividy,NomClient ORDER BY nombre DESC LIMIT 3;    
+  SELECT NomClient,CAST(COUNT(idClientNividy) as int) as nombre FROM v_EnchereFiniDetail GROUP BY  idClientNividy,NomClient ORDER BY nombre DESC LIMIT 3;    

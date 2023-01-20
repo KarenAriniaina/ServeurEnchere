@@ -3,9 +3,7 @@ package Tp.controller;
 import java.sql.Connection;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,7 +53,7 @@ public class ConfigurationController {
                 c.setIdConfiguration("Configuration_1");
                 ObjetBDD[] lc = c.Find(con);
                 c.setDureeMax(dureemax);
-                c.setDureeMin(dureemin);
+                c.setDureMin(dureemin);
                 c.setCommission(commission);
                 con.setAutoCommit(false);
                 if (lc.length == 0)
@@ -63,6 +61,7 @@ public class ConfigurationController {
                 else
                     c.Update(con);
                 con.commit();
+                json.setStatus(true);
                 json.setMessage("Operation reussi");
             } catch (Exception e) {
                 if (con != null)

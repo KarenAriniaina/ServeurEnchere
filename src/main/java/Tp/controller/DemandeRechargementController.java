@@ -34,6 +34,7 @@ public class DemandeRechargementController {
         if (a.VerifToken()) {
             try {
                 DemandeRechargement d = new DemandeRechargement();
+                d.setNomTable("v_Rechargement");
                 d.setStatut(1);
                 ObjetBDD[] lc = d.Find(null);
                 json.setData(lc);

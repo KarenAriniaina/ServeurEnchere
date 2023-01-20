@@ -20,7 +20,7 @@ public class UtilisateurController {
     public JsonData LoginAdmin(@RequestParam String login, @RequestParam String mdp) throws Exception {
         JsonData json = new JsonData();
         try {
-            Admin a=new Admin();
+            Admin a = new Admin();
             a.setLogin(login);
             a.setMdp(mdp);
             a.EncrypterMdp();
@@ -29,10 +29,11 @@ public class UtilisateurController {
             System.arraycopy(list, 0, la, 0, la.length);
             if (la.length != 0) {
                 if (la[0] != null) {
-                    //--- tsy maintsy atsoina satria tsy auto setter ao amn re ObjetBDD re token---//
-                    Admin ad=la[0];
+                    // --- tsy maintsy atsoina satria tsy auto setter ao amn re ObjetBDD re
+                    // token---//
+                    Admin ad = la[0];
                     ad.getToken();
-                    la[0]=a;
+                    la[0] = ad;
                     json.setData(la);
                     json.setMessage("Operation reussie");
                     json.setStatus(true);
@@ -58,7 +59,7 @@ public class UtilisateurController {
     public JsonData LoginClient(@RequestParam String email, @RequestParam String mdp) throws Exception {
         JsonData json = new JsonData();
         try {
-            Client c=new Client();
+            Client c = new Client();
             c.setEmail(email);
             c.setMdp(mdp);
             c.EncrypterMdp();
@@ -67,10 +68,11 @@ public class UtilisateurController {
             System.arraycopy(list, 0, lc, 0, lc.length);
             if (lc.length != 0) {
                 if (lc[0] != null) {
-                    //--- tsy maintsy atsoina satria tsy auto setter ao amn re ObjetBDD re token---//
-                    Client ad=lc[0];
+                    // --- tsy maintsy atsoina satria tsy auto setter ao amn re ObjetBDD re
+                    // token---//
+                    Client ad = lc[0];
                     ad.getToken();
-                    lc[0]=ad;
+                    lc[0] = ad;
                     json.setData(lc);
                     json.setMessage("Operation reussie");
                     json.setStatus(true);
@@ -80,6 +82,9 @@ public class UtilisateurController {
                     json.setMessage("failed to log");
                     json.setStatus(false);
                 }
+            } else {
+                json.setMessage("failed to log");
+                json.setStatus(false);
             }
         } catch (Exception e) {
             json.setData(null);
@@ -93,18 +98,19 @@ public class UtilisateurController {
 
     @CrossOrigin
     @PostMapping("/InscriptionClient")
-    public JsonData InscriptionClient(@RequestParam("nom") String nom,@RequestParam("email") String email, @RequestParam("mdp") String mdp) throws Exception {
+    public JsonData InscriptionClient(@RequestParam("nom") String nom, @RequestParam("email") String email,
+            @RequestParam("mdp") String mdp) throws Exception {
         JsonData json = new JsonData();
         try {
-            Client c=new Client();
+            Client c = new Client();
             c.setEmail(email);
             c.setMdp(mdp);
             c.setNom(nom);
             c.EncrypterMdp();
             c.Create(null);
-            c.setIdClient("Client_"+Integer.toString(c.currentSequence(null)));
-            Object[] lc=new Object[1];
-            lc[1]=c;
+            // c.setIdClient("Client_"+Integer.toString(c.currentSequence(null)));
+            Object[] lc = new Object[1];
+            lc[1] = c;
             json.setData(lc);
             json.setMessage("Operation Reussi");
         } catch (Exception e) {

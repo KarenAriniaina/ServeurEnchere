@@ -79,6 +79,7 @@ public class CategorieController {
                 Object[] lc = new Object[1];
                 lc[0] = c;
                 json.setData(lc);
+                json.setStatus(true);
                 json.setMessage("Operation reussi");
             } catch (Exception e) {
                 json.setData(null);
@@ -154,5 +155,4 @@ public class CategorieController {
         return json;
 
     }
-
 }
