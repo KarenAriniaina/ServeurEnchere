@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
+
 import Tp.JSonData.JsonData;
 import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
@@ -269,36 +271,36 @@ public class EnchereController {
     @RequestMapping("/RechercheEncheres")
     public JsonData RechereAvance(@RequestParam String motsCle, @RequestParam String idCategorie,
             @RequestParam Double prixmin, @RequestParam Double prixmax,
-            @RequestParam Date Datedebut, @RequestParam Date DateFin) throws Exception {
+            @RequestParam String Datedebut, @RequestParam String DateFin) throws Exception {
         JsonData json = new JsonData();
         try {
             String requtes = "SELECT  * FROM enchere where 1=1";
-            if (motsCle != null) {
-                requtes += " AND description like '%" + motsCle + "'%";
+            if ( !motsCle.equalsIgnoreCase("") ) {
+                requtes += " AND description like '%" + motsCle + "%'";
             }
             if (idCategorie != null) {
                 requtes += " AND idCategorie='" + idCategorie + "'";
             }
-            if (DateFin != null || Datedebut != null) {
-                if (DateFin != null && Datedebut != null) {
-                    requtes += " AND (Date BETWEEN" + Datedebut + " and " + DateFin + ")";
+            if (!DateFin.equalsIgnoreCase("") || !Datedebut.equalsIgnoreCase("")) {
+                if (!DateFin.equalsIgnoreCase("") && !Datedebut.equalsIgnoreCase("") ) {
+                    requtes += " AND (Date BETWEEN '" + Datedebut + "' and '" + DateFin + "' )";
                 }
-                if (DateFin != null && Datedebut == null) {
-                    requtes += " AND (Date <=" + DateFin + ")";
+                if (DateFin.equalsIgnoreCase("") && Datedebut.equalsIgnoreCase("")) {
+                    requtes += " AND (Date <= '" + DateFin + "' )";
                 }
-                if (DateFin == null && Datedebut != null) {
-                    requtes += " AND (Date >=" + Datedebut + ")";
+                if (DateFin == null && Datedebut.equalsIgnoreCase("")) {
+                    requtes += " AND (Date >= '" + Datedebut + "' )";
                 }
             }
-            if (prixmax != null || prixmin != null) {
-                if (prixmax != null && prixmin != null) {
-                    requtes += " AND (prix BETWEEN" + prixmin + " and " + prixmax + ")";
+            if (prixmax != 0 || prixmin != 0 ) {
+                if (prixmax != 0 && prixmin != 0) {
+                    requtes += " AND (prixdepart BETWEEN " + prixmin + " and " + prixmax + ")";
                 }
-                if (prixmax != null && prixmin == null) {
-                    requtes += " AND (prix <=" + prixmax + ")";
+                if (prixmax != 0 && prixmin == 0) {
+                    requtes += " AND (prixdepart <=" + prixmax + ")";
                 }
-                if (prixmax == null && prixmin != null) {
-                    requtes += " AND (prix >=" + prixmin + ")";
+                if (prixmax == 0 && prixmin != 0) {
+                    requtes += " AND (prixdepart >=" + prixmin + ")";
                 }
             }
 
