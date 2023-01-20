@@ -2,21 +2,14 @@ package Tp.model;
 
 import java.sql.Connection;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.print.Doc;
-
 import java.sql.Timestamp;
 
 import org.bson.Document;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-
-import com.google.gson.Gson;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 

@@ -1,8 +1,6 @@
 package Tp.controller;
 
 import java.sql.Connection;
-import java.util.Date;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +14,6 @@ import Tp.dao.Connexion;
 import Tp.dao.ObjetBDD;
 import Tp.model.Admin;
 import Tp.model.Categorie;
-import Tp.model.Enchere;
 
 @RestController
 public class CategorieController {
